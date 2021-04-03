@@ -41,3 +41,30 @@ class BookAdmin(CommonModelAdmin):
 @admin.register(Practical)
 class PracticalAdmin(CommonModelAdmin):
     list_display = ['active', 'name', 'book']
+
+@admin.register(UserProfile)
+class UserProfileAdmin(admin.ModelAdmin):
+    list_display = ['active', 'user', 'first_name', 'subjects']
+    list_display_links = ['user']
+    def is_active(self, request):
+        print(self)
+    ordering = ['user__username']
+
+
+from django.contrib import admin
+from django.contrib.auth.admin import UserAdmin
+
+from django.contrib.auth.models import User
+from .models import UserProfile
+
+class ProfileInline(admin.StackedInline):
+    model = UserProfile
+    fk_name = 'user'
+    can_delete = False
+    max_num = 1
+
+class CustomUserAdmin(UserAdmin):
+    inlines = [ProfileInline, ]
+
+admin.site.unregister(User)
+admin.site.register(User, CustomUserAdmin)

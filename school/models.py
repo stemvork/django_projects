@@ -69,3 +69,31 @@ class Practical(models.Model):
 
 class MaterialList(models.Model):
     practical = models.ForeignKey(Practical, on_delete=models.CASCADE, null=True)
+
+from django.contrib.auth.models import User
+from django.db.models.signals import post_save
+class UserProfile(models.Model):
+    user       = models.ForeignKey(User, on_delete=models.CASCADE, editable=False)
+    subject    = models.ManyToManyField(Subject)
+    
+    def active(self):
+        return self.user.is_active
+    active.boolean = True
+    
+    def first_name(self):
+        return self.user.first_name
+
+    def subjects(self):
+        return ', '.join(map(str, self.subject.all()))
+
+    def __str__(self):
+        return self.user.username
+
+# def create_user_profile(sender, instance, created, **kwargs):
+#     if created:
+#         profile = UserProfile()
+#         profile.user = instance
+#         profile.save()
+# 
+# post_save.connect(create_user_profile, sender=User)
+
